@@ -411,11 +411,11 @@ def main():
     vault = Path(args.vault)
     novel = args.novel
 
-    # Load state machine & item continuity
+    # Load state machine & item continuity (optional — created per-volume)
     state_path = vault / novel / "04-狀態追蹤" / "角色狀態機.md"
     item_path = vault / novel / "04-狀態追蹤" / "物品連續性.md"
-    char_states = parse_character_states(state_path)
-    items_db = parse_item_continuity(item_path)
+    char_states = parse_character_states(state_path) if state_path.exists() else {}
+    items_db = parse_item_continuity(item_path) if item_path.exists() else {}
 
     all_issues = []
 
