@@ -38,19 +38,15 @@ def read_body(path: Path) -> str:
 
 
 def get_chapter_paths(vault: Path, novel: str) -> list[Path]:
+    """Return all chapter markdown files, including nested volume/subfolders."""
     chapters_dir = vault / novel / "03-章節"
     if not chapters_dir.exists():
         return []
-    files = []
-    # Scan both flat dir and volume subdirs
-    for f in sorted(chapters_dir.iterdir()):
-        if f.is_dir():
-            for sub in sorted(f.iterdir()):
-                if sub.suffix == ".md" and "_大綱" not in sub.stem:
-                    files.append(sub)
-        elif f.suffix == ".md" and "_大綱" not in f.stem:
-            files.append(f)
-    return files
+
+    return sorted(
+        f for f in chapters_dir.rglob("*.md")
+        if "_大綱" not in f.stem and not f.name.startswith(".")
+    )
 
 
 def get_global_summary(vault: Path, novel: str) -> str:
@@ -116,8 +112,9 @@ def _chapter_number(path: Path) -> int:
 def get_arc_info(vault: Path, novel: str, volume: int = None) -> str:
     if volume is None:
         return ""
-    # Try volume-specific arc files
     arcs_dir = vault / novel / "02-大綱"
+    if not arcs_dir.exists():
+        return ""
     vol_prefix = f"{volume:02d}"
     for f in sorted(arcs_dir.iterdir()):
         if f.suffix == ".md" and f.stem.startswith(vol_prefix):
@@ -190,7 +187,7 @@ def build_context(vault: Path, novel: str, chapter: int, vector_query: str = Non
 
 def main():
     parser = argparse.ArgumentParser(description="彙整寫作上下文給 AI agent")
-    parser.add_argument("--novel", required=True, help="小說名稱（對應資料夾）")
+    parser.add_argument("--novel", required=True, help="小說 ID 或名稱")
     parser.add_argument("--chapter", type=int, required=True, help="即將寫的章節編號")
     parser.add_argument("--vector-query", help="選擇性語義檢索查詢")
     parser.add_argument("--vault", default=str(DEFAULT_VAULT), help="Obsidian vault 根目錄")
