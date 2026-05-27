@@ -37,6 +37,11 @@ def read_body(path: Path) -> str:
     return m.group(1).strip() if m else text.strip()
 
 
+def read_state_doc(vault: Path, novel: str, filename: str, fallback: str = "（尚未定義）") -> str:
+    path = vault / novel / "04-狀態追蹤" / filename
+    return read_body(path) or fallback
+
+
 def get_chapter_paths(vault: Path, novel: str) -> list[Path]:
     """Return all chapter markdown files, including nested volume/subfolders."""
     chapters_dir = vault / novel / "03-章節"
@@ -45,13 +50,20 @@ def get_chapter_paths(vault: Path, novel: str) -> list[Path]:
 
     return sorted(
         f for f in chapters_dir.rglob("*.md")
-        if "_大綱" not in f.stem and not f.name.startswith(".")
+        if "_大綱" not in f.stem and not f.name.startswith(".") and "Deleted" not in f.parts
     )
 
 
 def get_global_summary(vault: Path, novel: str) -> str:
-    path = vault / novel / "04-狀態追蹤" / "全局摘要.md"
-    return read_body(path) or "（尚無摘要）"
+    return read_state_doc(vault, novel, "全局摘要.md", "（尚無摘要）")
+
+
+def get_timeline(vault: Path, novel: str) -> str:
+    return read_state_doc(vault, novel, "時間線.md", "（尚無時間線）")
+
+
+def get_system_state(vault: Path, novel: str) -> str:
+    return read_state_doc(vault, novel, "系統狀態.md", "（尚無系統狀態）")
 
 
 def get_character_state(vault: Path, novel: str) -> str:
@@ -70,6 +82,18 @@ def get_character_state(vault: Path, novel: str) -> str:
                     lines.append(f"- {name} | {status} | {ability}")
         return "\n".join(lines) if lines else "（尚無角色）"
     return body
+
+
+def get_item_continuity(vault: Path, novel: str) -> str:
+    return read_state_doc(vault, novel, "物品連續性.md", "（尚無物品連續性）")
+
+
+def get_rule_continuity(vault: Path, novel: str) -> str:
+    return read_state_doc(vault, novel, "規則連續性.md", "（尚無規則連續性）")
+
+
+def get_scene_mechanics(vault: Path, novel: str) -> str:
+    return read_state_doc(vault, novel, "場景機制.md", "（尚無場景機制）")
 
 
 def get_foreshadowing_table(vault: Path, novel: str) -> str:
@@ -160,8 +184,23 @@ def build_context(vault: Path, novel: str, chapter: int, vector_query: str = Non
     parts.append("=== 全局摘要 ===")
     parts.append(get_global_summary(vault, novel))
 
+    parts.append("\n=== 時間線 ===")
+    parts.append(get_timeline(vault, novel))
+
+    parts.append("\n=== 系統狀態 ===")
+    parts.append(get_system_state(vault, novel))
+
     parts.append("\n=== 角色狀態 ===")
     parts.append(get_character_state(vault, novel))
+
+    parts.append("\n=== 物品連續性 ===")
+    parts.append(get_item_continuity(vault, novel))
+
+    parts.append("\n=== 規則連續性 ===")
+    parts.append(get_rule_continuity(vault, novel))
+
+    parts.append("\n=== 場景機制 ===")
+    parts.append(get_scene_mechanics(vault, novel))
 
     parts.append("\n=== 伏筆管理 ===")
     parts.append(get_foreshadowing_table(vault, novel))
