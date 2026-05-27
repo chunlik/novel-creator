@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "無限直播間/03-章節/01-夜班便利店/002-牛奶与红纸.md",
+                "file": "無限直播間/03-章節/01-夜班便利店/008-结算.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "002-牛奶与红纸"
+              "title": "008-结算"
             }
           }
         ]
@@ -94,7 +94,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "無限直播間/03-章節/01-夜班便利店/002-牛奶与红纸.md",
+                "file": "無限直播間/03-章節/01-夜班便利店/008-结算.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -104,7 +104,7 @@
                 "unlinkedCollapsed": true
               },
               "icon": "links-coming-in",
-              "title": "Backlinks for 002-牛奶与红纸"
+              "title": "Backlinks for 008-结算"
             }
           },
           {
@@ -113,12 +113,12 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "無限直播間/03-章節/01-夜班便利店/002-牛奶与红纸.md",
+                "file": "無限直播間/03-章節/01-夜班便利店/008-结算.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               },
               "icon": "links-going-out",
-              "title": "Outgoing links from 002-牛奶与红纸"
+              "title": "Outgoing links from 008-结算"
             }
           },
           {
@@ -156,13 +156,13 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "無限直播間/03-章節/01-夜班便利店/002-牛奶与红纸.md",
+                "file": "無限直播間/03-章節/01-夜班便利店/008-结算.md",
                 "followCursor": false,
                 "showSearch": false,
                 "searchQuery": ""
               },
               "icon": "lucide-list",
-              "title": "Outline of 002-牛奶与红纸"
+              "title": "Outline of 008-结算"
             }
           }
         ]
@@ -185,6 +185,9 @@
   },
   "active": "ee68a28d8ed0fe52",
   "lastOpenFiles": [
+    "無限直播間/03-章節/01-夜班便利店/002-牛奶与红纸.md",
+    "無限直播間/03-章節/01-夜班便利店/008-结算.md",
+    "無限直播間/03-章節/01-夜班便利店/007-打烊倒数.md",
     "無限直播間/03-章節/01-夜班便利店/006-未登记身份.md",
     "無限直播間/05-AI上下文/風格規則.md",
     "無限直播間/05-AI上下文/禁止事項.md",
@@ -194,7 +197,6 @@
     "_腳本/小說設定.py",
     "無限直播間/03-章節/01-夜班便利店/005-灯光下.md",
     "無限直播間/03-章節/01-夜班便利店/001-规则的第一夜.md",
-    "無限直播間/03-章節/01-夜班便利店/002-牛奶与红纸.md",
     "無限直播間/03-章節/01-夜班便利店/004-黑伞.md",
     "無限直播間/03-章節/01-夜班便利店/003-红雨衣人巡逻.md",
     "無限直播間/02-大綱/卷/卷1-夜班便利店.md",
@@ -214,8 +216,6 @@
     "無限直播間/03-章節/卷1-夜班便利店",
     "無限直播間/02-大綱/卷1大綱-rewrite.md",
     "無限直播間/04-狀態追蹤/物品連續性.md",
-    "無限直播間/04-狀態追蹤/角色狀態機.md",
-    "無限直播間/Deleted/物品連續性.md",
     "無限直播間/Deleted/02-記憶放映廳",
     "無限直播間/Deleted",
     "無限直播間/03-章節/02-記憶放映廳",
