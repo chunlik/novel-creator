@@ -8,6 +8,7 @@ Usage:
 """
 
 import argparse
+import hashlib
 import json
 import re
 import numpy as np
@@ -19,6 +20,10 @@ DEFAULT_VAULT = Path(__file__).resolve().parent.parent
 INDEX_DIR_NAME = ".vector_index"
 
 
+def _text_hash(text: str) -> str:
+    return hashlib.sha256(text.encode("utf-8")).hexdigest()
+
+
 def get_chunks(vault: Path, novel: str, chunk_size: int = 500) -> list[dict]:
     chapters_dir = vault / novel / "03-章節"
     chunks = []
@@ -26,6 +31,8 @@ def get_chunks(vault: Path, novel: str, chunk_size: int = 500) -> list[dict]:
         return chunks
 
     for f in sorted(chapters_dir.rglob("*.md")):
+        if f.name.startswith("."):
+            continue
         text = f.read_text(encoding="utf-8").lstrip("\ufeff")
         body_m = re.search(r"^---\s*\n.*?\n---\s*\n(.*)", text, re.DOTALL)
         body = body_m.group(1).strip() if body_m else text.strip()
@@ -39,13 +46,28 @@ def get_chunks(vault: Path, novel: str, chunk_size: int = 500) -> list[dict]:
                 continue
             chunks.append({
                 "source": f.stem,
+                "path": str(f.relative_to(vault)),
                 "text": segment,
                 "start_char": i,
+                "hash": _text_hash(segment),
             })
     return chunks
 
 
-def build_or_load_index(vault: Path, novel: str, chunks: list[dict]):
+def _meta_matches_chunks(meta: list[dict], chunks: list[dict]) -> bool:
+    if len(meta) != len(chunks):
+        return False
+    for old, new in zip(meta, chunks):
+        if old.get("path") != new.get("path"):
+            return False
+        if old.get("start_char") != new.get("start_char"):
+            return False
+        if old.get("hash") != new.get("hash"):
+            return False
+    return True
+
+
+def build_or_load_index(vault: Path, novel: str, chunks: list[dict], rebuild: bool = False):
     index_dir = vault / INDEX_DIR_NAME
     index_dir.mkdir(parents=True, exist_ok=True)
     index_file = index_dir / f"{novel}_embeddings.npy"
@@ -59,11 +81,11 @@ def build_or_load_index(vault: Path, novel: str, chunks: list[dict]):
 
     model = SentenceTransformer("paraphrase-multilingual-MiniLM-L12-v2")
 
-    if index_file.exists() and meta_file.exists():
+    if not rebuild and index_file.exists() and meta_file.exists():
         embeddings = np.load(str(index_file))
         with open(meta_file, "r", encoding="utf-8") as f:
             meta = json.load(f)
-        if len(meta) == len(chunks):
+        if _meta_matches_chunks(meta, chunks):
             return embeddings, meta, model
 
     texts = [c["text"] for c in chunks]
@@ -75,13 +97,13 @@ def build_or_load_index(vault: Path, novel: str, chunks: list[dict]):
     return embeddings, chunks, model
 
 
-def search(vault: Path, novel: str, query: str, k: int = 5):
+def search(vault: Path, novel: str, query: str, k: int = 5, rebuild: bool = False):
     chunks = get_chunks(vault, novel)
     if not chunks:
         print("（無章節可供檢索）")
         return
 
-    embeddings, meta, model = build_or_load_index(vault, novel, chunks)
+    embeddings, meta, model = build_or_load_index(vault, novel, chunks, rebuild=rebuild)
     query_emb = model.encode([query])[0]
     scores = np.dot(embeddings, query_emb) / (
         np.linalg.norm(embeddings, axis=1) * np.linalg.norm(query_emb)
@@ -91,7 +113,8 @@ def search(vault: Path, novel: str, query: str, k: int = 5):
     for idx in top_indices:
         score = scores[idx]
         item = meta[idx]
-        print(f"\n[{item['source']}] (相關度: {score:.3f})")
+        source = item.get("path") or item.get("source")
+        print(f"\n[{source}] (相關度: {score:.3f})")
         print(f"{item['text'][:300]}...")
         print("---")
 
@@ -112,7 +135,7 @@ def main():
         for f in index_dir.glob(f"{novel_folder}_*"):
             f.unlink()
         print("索引已清除，將重建。")
-    search(vault, novel_folder, args.query, args.k)
+    search(vault, novel_folder, args.query, args.k, rebuild=args.rebuild)
 
 
 if __name__ == "__main__":
