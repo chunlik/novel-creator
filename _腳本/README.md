@@ -39,6 +39,8 @@
 外部腳本應生成符合標準 frontmatter 的 `.md` 檔案：
 - 必須包含 `type`, `novel_id`, `novel` 欄位
 - 章節檔案存入 `{novel_folder}/03-章節/{volume_dir}/{chapter_no}-{title}.md`
+- 卷大綱存入 `{novel_folder}/02-大綱/卷/`
+- AI 上下文存入 `{novel_folder}/05-AI上下文/`
 - 狀態追蹤檔案存入 `{novel_folder}/04-狀態追蹤/`
 
 ### 查詢介面
@@ -59,22 +61,84 @@
    python _腳本/update_state.py --novel infinite_livestream --volume {V} --chapter {N} --summary "..." --timeline "..."
    python _腳本/check_consistency.py --novel infinite_livestream --volume {V} --chapter {N}
    ```
-5. **手動更新**：`角色狀態機.md`、`物品連續性.md`
+5. **手動更新**：`角色狀態機.md`、`物品連續性.md`、`伏筆管理.md`
+
+### 完成一卷的封卷流程
+
+完成一卷後不要直接寫下一卷，先封卷：
+
+```bash
+python _腳本/check_consistency.py --novel infinite_livestream --volume {V}
+python _腳本/close_volume.py --novel infinite_livestream --volume {V} --title "卷名"
+```
+
+`close_volume.py` 會產生：
+
+```text
+{novel_folder}/02-大綱/卷/{V}-{卷名}_卷總結.md
+```
+
+封卷後必須人工補完：
+- 一句話總結
+- 本卷核心變化
+- 本卷完成事項
+- 已回收伏筆
+- 仍需承接的活躍伏筆
+- 角色封卷狀態
+- 物品封卷狀態
+- 下一卷承接事項
+
+### 啟動新卷的流程
+
+```bash
+python _腳本/start_volume.py --novel infinite_livestream --volume {NEXT_V} --title "新卷名" --first-chapter {FIRST_CHAPTER}
+```
+
+`start_volume.py` 會建立：
+
+```text
+{novel_folder}/03-章節/{NEXT_V}-{新卷名}/
+{novel_folder}/02-大綱/卷/{NEXT_V}-{新卷名}.md
+{novel_folder}/05-AI上下文/卷{NEXT_V}-{新卷名}_啟動包.md
+{novel_folder}/05-AI上下文/下一章指令.md
+```
+
+新卷啟動後，先人工補完卷大綱與啟動包，再產生 AI 上下文：
+
+```bash
+python _腳本/compile_context.py --novel infinite_livestream --chapter {FIRST_CHAPTER} --vector-query "新卷名 前卷承接 伏筆"
+```
 
 ## 可用腳本
 
 ### update_state.py
-更新全局摘要、時間線、伏筆狀態。
+更新全局摘要、時間線，並提醒手動更新伏筆與狀態檔。
 
 ### check_consistency.py
-角色約束檢查、物品連續性檢查、伏筆回收檢查。
+角色約束檢查、物品連續性檢查、伏筆回收檢查、frontmatter 完整性檢查。
 
 ### vector_search.py
 跨章節語義檢索（基於 sentence-transformers）。
-支援 `--rebuild` 強制重建索引。
+支援 `--rebuild` 強制重建索引，也會用 chunk hash 偵測內容變更。
 
 ### compile_context.py
-彙整寫作上下文給 AI agent，含全局摘要、角色狀態、活躍伏筆、前章回顧。
+彙整寫作上下文給 AI agent，含全局摘要、角色狀態、伏筆管理、前章回顧與可選語義檢索。
+
+### close_volume.py
+封卷工具。掃描指定卷章節，產生卷總結草稿，協助清點完成事項、伏筆與承接項目。
+
+### start_volume.py
+開卷工具。建立新卷章節資料夾、卷大綱、AI 啟動包，並更新下一章指令。
+
+## 共用範本
+
+| 範本 | 用途 |
+|------|------|
+| `_共用範本/章節範本.md` | 新章節 frontmatter 與寫作檢查表 |
+| `_共用範本/卷總結範本.md` | 手動建立卷總結 |
+| `_共用範本/新卷啟動包範本.md` | 手動建立新卷 AI 啟動包 |
+| `_共用範本/伏筆範本.md` | 單一伏筆條目 |
+| `_共用範本/設定條目範本.md` | 世界觀 / 規則 / 設定條目 |
 
 ## 預留整合場景
 
@@ -83,4 +147,5 @@
 | AI 章節生成 | 當前寫作包 + 風格規則 | 新章節 .md |
 | 向量檢索 | vault 全部 .md | 語義搜尋結果 |
 | 自動審校 | 單一章節 .md | 矛盾報告 |
-| 角色狀態分析 | 全部角色 .md | 發展軌跡圖 |
+| 封卷整理 | 已完成卷章節 + 狀態檔 | 卷總結草稿 |
+| 新卷啟動 | 前卷總結 + 新卷設定 | 卷大綱 + AI 啟動包 |
