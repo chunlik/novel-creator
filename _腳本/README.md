@@ -2,6 +2,21 @@
 
 本目錄提供 Python 腳本輔助 AI 寫作流程。
 
+## 給 AI Agent 的最高優先級規則
+
+如果是 ChatGPT、Codex、Claude Code 或其他 AI agent 操作本 repo，請先閱讀 repo 根目錄：
+
+```text
+AGENTS.md
+```
+
+`AGENTS.md` 定義了 AI agent 的操作協議：
+- 不能只產生空範本。
+- 能從章節、角色狀態、物品狀態、伏筆管理中推導的內容，必須自動補完。
+- 不可留下可被合理補完的 TODO。
+- 若資料不足，使用 `UNKNOWN:` 標記缺失來源，不要編造。
+- 封卷、開卷、寫下一章都要依照標準流程執行。
+
 ## 檔案格式標準
 
 所有 Obsidian 筆記使用以下標準：
@@ -61,7 +76,7 @@
    python _腳本/update_state.py --novel infinite_livestream --volume {V} --chapter {N} --summary "..." --timeline "..."
    python _腳本/check_consistency.py --novel infinite_livestream --volume {V} --chapter {N}
    ```
-5. **手動更新**：`角色狀態機.md`、`物品連續性.md`、`伏筆管理.md`
+5. **更新狀態**：AI agent 應根據章節內容更新 `角色狀態機.md`、`物品連續性.md`、`伏筆管理.md`；人類作者可人工覆核。
 
 ### 完成一卷的封卷流程
 
@@ -69,7 +84,7 @@
 
 ```bash
 python _腳本/check_consistency.py --novel infinite_livestream --volume {V}
-python _腳本/close_volume.py --novel infinite_livestream --volume {V} --title "卷名"
+python _腳本/close_volume.py --novel infinite_livestream --volume {V} --title "卷名" --overwrite
 ```
 
 `close_volume.py` 會產生：
@@ -78,7 +93,7 @@ python _腳本/close_volume.py --novel infinite_livestream --volume {V} --title 
 {novel_folder}/02-大綱/卷/{V}-{卷名}_卷總結.md
 ```
 
-封卷後必須人工補完：
+AI agent 必須根據本卷章節與狀態檔自動補完：
 - 一句話總結
 - 本卷核心變化
 - 本卷完成事項
@@ -88,10 +103,12 @@ python _腳本/close_volume.py --novel infinite_livestream --volume {V} --title 
 - 物品封卷狀態
 - 下一卷承接事項
 
+人類作者只需要覆核，不需要從空白 TODO 手動填起。
+
 ### 啟動新卷的流程
 
 ```bash
-python _腳本/start_volume.py --novel infinite_livestream --volume {NEXT_V} --title "新卷名" --first-chapter {FIRST_CHAPTER}
+python _腳本/start_volume.py --novel infinite_livestream --volume {NEXT_V} --title "新卷名" --first-chapter {FIRST_CHAPTER} --overwrite
 ```
 
 `start_volume.py` 會建立：
@@ -103,7 +120,7 @@ python _腳本/start_volume.py --novel infinite_livestream --volume {NEXT_V} --t
 {novel_folder}/05-AI上下文/下一章指令.md
 ```
 
-新卷啟動後，先人工補完卷大綱與啟動包，再產生 AI 上下文：
+AI agent 必須根據前卷總結、角色狀態、物品狀態與伏筆管理自動補完卷大綱與啟動包，再產生 AI 上下文：
 
 ```bash
 python _腳本/compile_context.py --novel infinite_livestream --chapter {FIRST_CHAPTER} --vector-query "新卷名 前卷承接 伏筆"
@@ -112,7 +129,7 @@ python _腳本/compile_context.py --novel infinite_livestream --chapter {FIRST_C
 ## 可用腳本
 
 ### update_state.py
-更新全局摘要、時間線，並提醒手動更新伏筆與狀態檔。
+更新全局摘要、時間線，並提醒更新伏筆與狀態檔。
 
 ### check_consistency.py
 角色約束檢查、物品連續性檢查、伏筆回收檢查、frontmatter 完整性檢查。
@@ -135,8 +152,8 @@ python _腳本/compile_context.py --novel infinite_livestream --chapter {FIRST_C
 | 範本 | 用途 |
 |------|------|
 | `_共用範本/章節範本.md` | 新章節 frontmatter 與寫作檢查表 |
-| `_共用範本/卷總結範本.md` | 手動建立卷總結 |
-| `_共用範本/新卷啟動包範本.md` | 手動建立新卷 AI 啟動包 |
+| `_共用範本/卷總結範本.md` | 建立卷總結 |
+| `_共用範本/新卷啟動包範本.md` | 建立新卷 AI 啟動包 |
 | `_共用範本/伏筆範本.md` | 單一伏筆條目 |
 | `_共用範本/設定條目範本.md` | 世界觀 / 規則 / 設定條目 |
 
@@ -147,5 +164,5 @@ python _腳本/compile_context.py --novel infinite_livestream --chapter {FIRST_C
 | AI 章節生成 | 當前寫作包 + 風格規則 | 新章節 .md |
 | 向量檢索 | vault 全部 .md | 語義搜尋結果 |
 | 自動審校 | 單一章節 .md | 矛盾報告 |
-| 封卷整理 | 已完成卷章節 + 狀態檔 | 卷總結草稿 |
+| 封卷整理 | 已完成卷章節 + 狀態檔 | 卷總結草稿 + AI 補完 |
 | 新卷啟動 | 前卷總結 + 新卷設定 | 卷大綱 + AI 啟動包 |
