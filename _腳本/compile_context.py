@@ -11,6 +11,7 @@ import yaml
 import re
 from pathlib import Path
 
+from 小說設定 import resolve_novel_folder
 
 DEFAULT_VAULT = Path(__file__).resolve().parent.parent
 
@@ -196,7 +197,8 @@ def main():
     args = parser.parse_args()
 
     vault = Path(args.vault)
-    context = build_context(vault, args.novel, args.chapter, args.vector_query)
+    novel_folder = resolve_novel_folder(args.novel)
+    context = build_context(vault, novel_folder, args.chapter, args.vector_query)
     print(context)
 
 

@@ -13,6 +13,7 @@ import re
 import numpy as np
 from pathlib import Path
 
+from 小說設定 import resolve_novel_folder
 
 DEFAULT_VAULT = Path(__file__).resolve().parent.parent
 INDEX_DIR_NAME = ".vector_index"
@@ -24,9 +25,7 @@ def get_chunks(vault: Path, novel: str, chunk_size: int = 500) -> list[dict]:
     if not chapters_dir.exists():
         return chunks
 
-    for f in sorted(chapters_dir.iterdir()):
-        if f.suffix != ".md":
-            continue
+    for f in sorted(chapters_dir.rglob("*.md")):
         text = f.read_text(encoding="utf-8")
         body_m = re.search(r"^---\s*\n.*?\n---\s*\n(.*)", text, re.DOTALL)
         body = body_m.group(1).strip() if body_m else text.strip()
@@ -106,7 +105,8 @@ def main():
     args = parser.parse_args()
 
     vault = Path(args.vault)
-    search(vault, args.novel, args.query, args.k)
+    novel_folder = resolve_novel_folder(args.novel)
+    search(vault, novel_folder, args.query, args.k)
 
 
 if __name__ == "__main__":

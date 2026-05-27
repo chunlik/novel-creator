@@ -11,6 +11,7 @@ import argparse
 import re
 from pathlib import Path
 
+from 小說設定 import resolve_novel_folder
 
 DEFAULT_VAULT = Path(__file__).resolve().parent.parent
 
@@ -409,7 +410,7 @@ def main():
     args = parser.parse_args()
 
     vault = Path(args.vault)
-    novel = args.novel
+    novel = resolve_novel_folder(args.novel)
 
     # Load state machine & item continuity (optional — created per-volume)
     state_path = vault / novel / "04-狀態追蹤" / "角色狀態機.md"

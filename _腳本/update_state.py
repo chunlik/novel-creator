@@ -11,6 +11,7 @@ import re
 from datetime import datetime
 from pathlib import Path
 
+from 小說設定 import resolve_novel_folder
 
 DEFAULT_VAULT = Path(__file__).resolve().parent.parent
 
@@ -89,13 +90,14 @@ def main():
     args = parser.parse_args()
 
     vault = Path(args.vault)
-    print(f"更新狀態: {args.novel} 卷{args.volume}·第{args.chapter}章")
+    novel_folder = resolve_novel_folder(args.novel)
+    print(f"更新狀態: {novel_folder} 卷{args.volume}·第{args.chapter}章")
 
     if args.summary:
-        update_global_summary(vault, args.novel, args.chapter, args.volume, args.summary)
-    update_foreshadowing(vault, args.novel, args.chapter, args.volume)
+        update_global_summary(vault, novel_folder, args.chapter, args.volume, args.summary)
+    update_foreshadowing(vault, novel_folder, args.chapter, args.volume)
     if args.timeline:
-        update_timeline(vault, args.novel, args.chapter, args.volume, args.timeline)
+        update_timeline(vault, novel_folder, args.chapter, args.volume, args.timeline)
 
     print()
     print("⚠  別忘了手動更新以下檔案：")
@@ -103,7 +105,7 @@ def main():
     print("    2. 04-狀態追蹤/物品連續性.md — 更新物品位置/狀態")
     print()
     print("    完成後執行檢查：")
-    print("    python _腳本/check_consistency.py --novel", args.novel, "--volume", f"{args.volume:02d}")
+    print("    python _腳本/check_consistency.py --novel", novel_folder, "--volume", f"{args.volume:02d}")
     print()
 
     print("狀態更新完成。")
