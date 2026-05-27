@@ -26,7 +26,7 @@ def get_chunks(vault: Path, novel: str, chunk_size: int = 500) -> list[dict]:
         return chunks
 
     for f in sorted(chapters_dir.rglob("*.md")):
-        text = f.read_text(encoding="utf-8")
+        text = f.read_text(encoding="utf-8").lstrip("\ufeff")
         body_m = re.search(r"^---\s*\n.*?\n---\s*\n(.*)", text, re.DOTALL)
         body = body_m.group(1).strip() if body_m else text.strip()
         if not body:

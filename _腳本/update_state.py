@@ -19,7 +19,7 @@ DEFAULT_VAULT = Path(__file__).resolve().parent.parent
 def read_frontmatter(path: Path):
     if not path.exists():
         return {}
-    text = path.read_text(encoding="utf-8")
+    text = path.read_text(encoding="utf-8").lstrip("\ufeff")
     m = re.match(r"^---\s*\n(.*?)\n---", text, re.DOTALL)
     if m:
         try:
@@ -32,7 +32,7 @@ def read_frontmatter(path: Path):
 def read_body(path: Path):
     if not path.exists():
         return ""
-    text = path.read_text(encoding="utf-8")
+    text = path.read_text(encoding="utf-8").lstrip("\ufeff")
     m = re.match(r"^---\s*\n.*?\n---\s*\n(.*)", text, re.DOTALL)
     return m.group(1).strip() if m else text.strip()
 
@@ -51,6 +51,10 @@ def update_global_summary(vault: Path, novel: str, chapter_no: int, volume: int,
     fm = {**get_novel_meta(novel), "type": "global_summary", "updated": str(datetime.now())}
     write_frontmatter(path, fm, body)
     print(f"  ✓ 全局摘要已更新（卷{volume}·第{chapter_no}章）")
+
+
+def update_foreshadowing(vault: Path, novel: str, chapter_no: int, volume: int = 1):
+    print("  ℹ 伏筆管理請手動更新。執行 python _腳本/check_consistency.py 確認無遺漏。")
 
 
 def update_timeline(vault: Path, novel: str, chapter_no: int, volume: int, timeline_entry: str):

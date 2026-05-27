@@ -19,7 +19,7 @@ DEFAULT_VAULT = Path(__file__).resolve().parent.parent
 def read_frontmatter(path: Path) -> dict:
     if not path.exists():
         return {}
-    text = path.read_text(encoding="utf-8")
+    text = path.read_text(encoding="utf-8").lstrip("\ufeff")
     m = re.match(r"^---\s*\n(.*?)\n---", text, re.DOTALL)
     if m:
         try:
@@ -32,7 +32,7 @@ def read_frontmatter(path: Path) -> dict:
 def read_body(path: Path) -> str:
     if not path.exists():
         return ""
-    text = path.read_text(encoding="utf-8")
+    text = path.read_text(encoding="utf-8").lstrip("\ufeff")
     m = re.match(r"^---\s*\n.*?\n---\s*\n(.*)", text, re.DOTALL)
     return m.group(1).strip() if m else text.strip()
 
@@ -59,7 +59,7 @@ def get_global_summary(vault: Path, novel: str) -> str:
 
 
 def get_character_state(vault: Path, novel: str) -> str:
-    path = vault / novel / "04-狀態追蹤" / "角色發展軌跡.md"
+    path = vault / novel / "04-狀態追蹤" / "角色狀態機.md"
     body = read_body(path)
     if not body:
         chars_dir = vault / novel / "01-設定工坊" / "角色"
@@ -76,7 +76,7 @@ def get_character_state(vault: Path, novel: str) -> str:
     return body
 
 
-def get_active_foreshadowing(vault: Path, novel: str) -> str:
+def get_foreshadowing_table(vault: Path, novel: str) -> str:
     path = vault / novel / "04-狀態追蹤" / "伏筆管理.md"
     body = read_body(path)
     if not body:
@@ -166,8 +166,8 @@ def build_context(vault: Path, novel: str, chapter: int, vector_query: str = Non
     parts.append("\n=== 角色狀態 ===")
     parts.append(get_character_state(vault, novel))
 
-    parts.append("\n=== 活躍伏筆 ===")
-    parts.append(get_active_foreshadowing(vault, novel))
+    parts.append("\n=== 伏筆管理 ===")
+    parts.append(get_foreshadowing_table(vault, novel))
 
     parts.append("\n=== 故事聖經 ===")
     bible = get_story_bible(vault, novel)

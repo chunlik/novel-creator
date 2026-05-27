@@ -16,7 +16,7 @@ DEFAULT_VAULT = Path(__file__).resolve().parent.parent
 def read_body(path: Path) -> str:
     if not path.exists():
         return ""
-    text = path.read_text(encoding="utf-8")
+    text = path.read_text(encoding="utf-8").lstrip("\ufeff")
     m = re.match(r"^---\s*\n.*?\n---\s*\n(.*)", text, re.DOTALL)
     return m.group(1).strip() if m else text.strip()
 

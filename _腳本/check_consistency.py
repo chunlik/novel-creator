@@ -19,7 +19,7 @@ DEFAULT_VAULT = Path(__file__).resolve().parent.parent
 # ─── helper ───────────────────────────────────────────────────────
 
 def read_file(path: Path) -> str:
-    return path.read_text(encoding="utf-8") if path.exists() else ""
+    return path.read_text(encoding="utf-8").lstrip("\ufeff") if path.exists() else ""
 
 
 def read_frontmatter(path: Path) -> dict:
