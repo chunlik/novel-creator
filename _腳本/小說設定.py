@@ -21,6 +21,16 @@ def resolve_novel_folder(novel_key: str) -> str:
     """Return actual folder name for any key (ID, CN title, TW title, or folder)."""
     return _ALIASES.get(novel_key, novel_key)
 
+def get_novel_meta(novel_key: str) -> dict:
+    """Return standardized frontmatter fields for any novel key.
+    Usage: write_frontmatter(path, {**get_novel_meta(key), "type": "...", ...}, body)"""
+    folder = resolve_novel_folder(novel_key)
+    for _id, info in NOVELS.items():
+        if info["folder"] == folder:
+            return {"novel_id": _id, "novel": info["title_cn"]}
+    return {"novel_id": novel_key, "novel": novel_key}
+
+
 def add_novel_arg(parser):
     """Add --novel argument with hint about available IDs."""
     ids = ", ".join(NOVELS.keys())

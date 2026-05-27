@@ -101,11 +101,17 @@ def main():
     parser.add_argument("--novel", required=True)
     parser.add_argument("--query", required=True)
     parser.add_argument("--k", type=int, default=5)
+    parser.add_argument("--rebuild", action="store_true", help="強制重建索引")
     parser.add_argument("--vault", default=str(DEFAULT_VAULT))
     args = parser.parse_args()
 
     vault = Path(args.vault)
     novel_folder = resolve_novel_folder(args.novel)
+    if args.rebuild:
+        index_dir = vault / INDEX_DIR_NAME
+        for f in index_dir.glob(f"{novel_folder}_*"):
+            f.unlink()
+        print("索引已清除，將重建。")
     search(vault, novel_folder, args.query, args.k)
 
 

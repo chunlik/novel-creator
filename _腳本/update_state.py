@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+﻿#!/usr/bin/env python3
 """update_state.py - 章節定稿後更新所有狀態檔案
 
 Usage:
@@ -11,7 +11,7 @@ import re
 from datetime import datetime
 from pathlib import Path
 
-from 小說設定 import resolve_novel_folder
+from 小說設定 import resolve_novel_folder, get_novel_meta
 
 DEFAULT_VAULT = Path(__file__).resolve().parent.parent
 
@@ -48,26 +48,9 @@ def update_global_summary(vault: Path, novel: str, chapter_no: int, volume: int,
     body = read_body(path)
     entry = f"\n## 卷{volume}·第{chapter_no}章\n{summary}\n"
     body += entry
-    write_frontmatter(path, {"type": "global_summary", "novel": novel, "updated": str(datetime.now())}, body)
+    fm = {**get_novel_meta(novel), "type": "global_summary", "updated": str(datetime.now())}
+    write_frontmatter(path, fm, body)
     print(f"  ✓ 全局摘要已更新（卷{volume}·第{chapter_no}章）")
-
-
-def update_foreshadowing(vault: Path, novel: str, chapter_no: int, volume: int = 1):
-    foreshadow_dir = vault / novel / "04-狀態追蹤"
-    if not foreshadow_dir.exists():
-        return
-    for f in sorted(foreshadow_dir.iterdir()):
-        if f.suffix != ".md":
-            continue
-        fm = read_frontmatter(f)
-        if fm.get("type") != "foreshadowing":
-            continue
-        body = read_body(f)
-        payoff_ch = fm.get("payoff_chapter")
-        if payoff_ch and int(payoff_ch) == chapter_no:
-            fm["status"] = "payed_off"
-            write_frontmatter(f, fm, body)
-            print(f"  ✓ 伏筆「{fm.get('title', f.stem)}」已標記為 payed_off")
 
 
 def update_timeline(vault: Path, novel: str, chapter_no: int, volume: int, timeline_entry: str):
@@ -75,7 +58,8 @@ def update_timeline(vault: Path, novel: str, chapter_no: int, volume: int, timel
     body = read_body(path)
     entry = f"\n| 卷{volume}·第{chapter_no}章 | {timeline_entry} |\n"
     body += entry
-    write_frontmatter(path, {"type": "timeline", "novel": novel, "updated": str(datetime.now())}, body)
+    fm = {**get_novel_meta(novel), "type": "timeline", "updated": str(datetime.now())}
+    write_frontmatter(path, fm, body)
     print(f"  ✓ 時間線已更新（卷{volume}·第{chapter_no}章）")
 
 

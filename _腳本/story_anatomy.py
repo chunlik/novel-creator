@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+﻿#!/usr/bin/env python3
 """story_anatomy.py - 分析已寫章節的結構健康度
 
 Usage:
@@ -72,7 +72,7 @@ def analyze(vault: Path, novel: str):
 
     fs_dir = vault / novel / "04-狀態追蹤"
     active = 0
-    payed = 0
+    paid = 0
     if fs_dir.exists():
         for f in fs_dir.iterdir():
             if f.suffix != ".md":
@@ -80,11 +80,11 @@ def analyze(vault: Path, novel: str):
             text = f.read_text(encoding="utf-8")
             if "status: active" in text:
                 active += 1
-            elif "status: payed_off" in text:
-                payed += 1
+            elif "status: paid" in text:
+                paid += 1
     print(f"\n🔍 伏筆統計:")
     print(f"   活躍中: {active}")
-    print(f"   已回收: {payed}")
+    print(f"   已回收: {paid}")
 
 
 def main():
