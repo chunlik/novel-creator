@@ -42,6 +42,11 @@ def read_state_doc(vault: Path, novel: str, filename: str, fallback: str = "（�
     return read_body(path) or fallback
 
 
+def read_system_doc(vault: Path, filename: str, fallback: str = "（尚未定義）") -> str:
+    path = vault / "_系統" / filename
+    return read_body(path) or fallback
+
+
 def get_chapter_paths(vault: Path, novel: str) -> list[Path]:
     """Return all chapter markdown files, including nested volume/subfolders."""
     chapters_dir = vault / novel / "03-章節"
@@ -94,6 +99,10 @@ def get_rule_continuity(vault: Path, novel: str) -> str:
 
 def get_scene_mechanics(vault: Path, novel: str) -> str:
     return read_state_doc(vault, novel, "場景機制.md", "（尚無場景機制）")
+
+
+def get_story_quality_rubric(vault: Path) -> str:
+    return read_system_doc(vault, "story_quality_rubric.md", "（尚無小說品質規準）")
 
 
 def get_foreshadowing_table(vault: Path, novel: str) -> str:
@@ -204,6 +213,9 @@ def build_context(vault: Path, novel: str, chapter: int, vector_query: str = Non
 
     parts.append("\n=== 伏筆管理 ===")
     parts.append(get_foreshadowing_table(vault, novel))
+
+    parts.append("\n=== 小說品質規準 ===")
+    parts.append(get_story_quality_rubric(vault))
 
     parts.append("\n=== 故事聖經 ===")
     bible = get_story_bible(vault, novel)
