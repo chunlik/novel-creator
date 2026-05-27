@@ -53,6 +53,21 @@ def parse_table(text: str, col_count: int) -> list[list[str]]:
     return rows
 
 
+def _chapter_number(path: Path) -> str:
+    m = re.search(r"(\d+)", path.stem)
+    return m.group(1).lstrip("0") if m else "0"
+
+
+def _volume_number(path: Path, chapters_dir: Path) -> str:
+    try:
+        rel = path.relative_to(chapters_dir)
+    except ValueError:
+        return "0"
+    first_part = rel.parts[0] if rel.parts else ""
+    m = re.search(r"(\d+)", first_part)
+    return m.group(1).lstrip("0") if m else "0"
+
+
 # ─── parse character state machine ────────────────────────────────
 
 def parse_character_states(path: Path) -> dict:
@@ -81,7 +96,7 @@ def parse_character_states(path: Path) -> dict:
                 in_state_log = False
             continue
 
-        # Detect constraint table start (|约束|... )
+        # Detect constraint table start
         if "| 約束 |" in line or "| 約束|" in line:
             in_constraints = True
             in_state_log = False
@@ -174,23 +189,20 @@ def parse_item_continuity(path: Path) -> dict:
 # ─── chapter discovery ────────────────────────────────────────────
 
 def find_chapter(vault: Path, novel: str, volume: str, chapter: str) -> Path | None:
-    """Locate chapter file by volume and chapter number."""
+    """Locate chapter file by volume and chapter number, including nested folders."""
     vol_dir = vault / novel / "03-章節"
     if not vol_dir.exists():
         return None
 
-    # Find volume directory
-    vol_path = None
-    for d in sorted(vol_dir.iterdir()):
-        if d.is_dir() and volume in d.name:
-            vol_path = d
-            break
-    if not vol_path:
-        return None
+    target_volume = str(volume).lstrip("0") or "0"
+    target_chapter = str(chapter).lstrip("0") or "0"
 
-    # Find chapter file
-    for f in sorted(vol_path.iterdir()):
-        if f.suffix == ".md" and chapter in f.stem.replace("章", ""):
+    for f in sorted(vol_dir.rglob("*.md")):
+        if f.name.startswith(".") or "_大綱" in f.stem:
+            continue
+        vol_num = _volume_number(f, vol_dir)
+        ch_num = _chapter_number(f)
+        if vol_num == target_volume and ch_num == target_chapter:
             return f
 
     return None
@@ -205,26 +217,45 @@ def get_chapter_fm(vault: Path, novel: str, volume: str, chapter: str):
 
 
 def get_all_chapters(vault: Path, novel: str, volume: str | None) -> list[tuple[str, str, str]]:
-    """Return list of (volume, chapter_no, chapter_path) tuples."""
+    """Return list of (volume, chapter_no, chapter_path) tuples, including nested folders."""
     vol_dir = vault / novel / "03-章節"
     if not vol_dir.exists():
         return []
 
+    target_volume = str(volume).lstrip("0") if volume else None
     chapters = []
-    for d in sorted(vol_dir.iterdir()):
-        if not d.is_dir():
+    for f in sorted(vol_dir.rglob("*.md")):
+        if f.name.startswith(".") or "_大綱" in f.stem:
             continue
-        vol_num = d.name[:2]  # "01", "02", etc.
-        if volume and volume.zfill(2) != vol_num.zfill(2):
+        vol_num = _volume_number(f, vol_dir)
+        if target_volume and vol_num != target_volume:
             continue
-        for f in sorted(d.iterdir()):
-            if f.suffix == ".md":
-                ch = f.stem.split("-")[0].lstrip("0")
-                chapters.append((vol_num, ch, str(f)))
+        ch = _chapter_number(f)
+        chapters.append((vol_num, ch, str(f)))
     return chapters
 
 
 # ─── checks ───────────────────────────────────────────────────────
+
+def check_frontmatter_completeness(fm: dict) -> list[str]:
+    required = [
+        "type",
+        "novel_id",
+        "novel",
+        "title",
+        "chapter_no",
+        "volume",
+        "arc",
+        "status",
+    ]
+    issues = []
+    for field in required:
+        if field not in fm or fm[field] in (None, "", []):
+            issues.append(f"⚠ frontmatter 缺少必要欄位: {field}")
+    if fm.get("type") and fm.get("type") != "chapter":
+        issues.append(f"⚠ frontmatter type 應為 chapter，現在是: {fm.get('type')}")
+    return issues
+
 
 def check_constraints(
     body: str,
@@ -255,7 +286,7 @@ def check_constraints(
 
             if char_name == "周仓":
                 if constraint_name == "心跳倒數·被動預警":
-                    # Check if心跳倒数 triggered for non-threats
+                    # Check if 心跳倒數 triggered for non-threats
                     pass  # Hard to auto-detect, need manual check for now
 
     return issues
@@ -366,13 +397,9 @@ def check_chapter(
     issues.extend(check_consumed_foreshadowing(vault, novel, body))
 
     # 3. Frontmatter completeness
-    required = ["title", "chapter_no", "arc", "status"]
-    for field in required:
-        if field not in fm or not fm[field]:
-            issues.append(f"⚠ frontmatter 缺少必要欄位: {field}")
+    issues.extend(check_frontmatter_completeness(fm))
 
     # 4. Character constraints
-    used_chars = fm.get("characters_used", [])
     cons_issues = check_constraints(body, chapter_label, char_states)
     issues.extend(cons_issues)
 
