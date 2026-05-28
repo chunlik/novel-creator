@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "_提示詞工坊/章節重寫.md",
+                "file": "AGENTS.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "章節重寫"
+              "title": "AGENTS"
             }
           }
         ]
@@ -94,7 +94,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "_提示詞工坊/章節重寫.md",
+                "file": "AGENTS.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -104,7 +104,7 @@
                 "unlinkedCollapsed": true
               },
               "icon": "links-coming-in",
-              "title": "Backlinks for 章節重寫"
+              "title": "Backlinks for AGENTS"
             }
           },
           {
@@ -113,12 +113,12 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "_提示詞工坊/章節重寫.md",
+                "file": "AGENTS.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               },
               "icon": "links-going-out",
-              "title": "Outgoing links from 章節重寫"
+              "title": "Outgoing links from AGENTS"
             }
           },
           {
@@ -156,13 +156,13 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "_提示詞工坊/章節重寫.md",
+                "file": "AGENTS.md",
                 "followCursor": false,
                 "showSearch": false,
                 "searchQuery": ""
               },
               "icon": "lucide-list",
-              "title": "Outline of 章節重寫"
+              "title": "Outline of AGENTS"
             }
           }
         ]
@@ -183,8 +183,31 @@
       "bases:Create new base": false
     }
   },
-  "active": "1890dfb2bde6cf14",
+  "active": "ee68a28d8ed0fe52",
   "lastOpenFiles": [
+    "無限直播間/01-設定工坊/副本技法參考.md",
+    "無限直播間/00-AI導航.md",
+    "_共用範本/副本範本.md",
+    "_共用範本/卷總結範本.md",
+    "_共用範本/角色範本.md",
+    "_共用範本/大綱範本.md",
+    "_共用知識庫/寫作手法/從紅月手法.md",
+    "_共用知識庫/寫作手法/從紅月寫作技法大全.md",
+    "工作台.md",
+    "寫作參考_從紅月手法.md",
+    "無限直播間/03-章節/01-夜班便利店/001-規則的第一夜.md",
+    "_腳本/build_revision_task.py",
+    "_腳本/build_chapter_graph.py",
+    "無限直播間/04-狀態追蹤/伏筆管理.md",
+    "無限直播間/02-大綱/副本設計/夜班便利店守則.md",
+    "無限直播間/02-大綱/卷/卷1-夜班便利店.md",
+    "_系統/story_quality_rubric.md",
+    "_腳本/evaluate_story_quality.py",
+    "Deleted/卷2-記憶放映廳.md",
+    "Deleted/001-规则的第一夜.md",
+    "Deleted/01-夜班便利店_卷總結.md",
+    "Deleted/02-記憶放映廳.md",
+    "_提示詞工坊/章節重寫.md",
     "無限直播間/03-章節/01-夜班便利店/002-牛奶与红纸.md.tmp.31232.969e05073604",
     "無限直播間/06-審校/章節品質評估.md",
     "無限直播間/06-審校/章節邏輯驗證.md",
@@ -193,33 +216,10 @@
     "_提示詞工坊/README.md",
     "_提示詞工坊/伏筆回收.md",
     "無限直播間/04-狀態追蹤/謎團管理.md",
-    "無限直播間/05-AI上下文/禁止事項.md",
-    "無限直播間/05-AI上下文/當前寫作包.md",
-    "無限直播間/05-AI上下文/風格規則.md",
-    "無限直播間/05-AI上下文/卷2-記憶放映廳_啟動包.md",
-    "無限直播間/06-審校/章節檢查清單.md",
-    "無限直播間/06-審校/矛盾檢測.md",
-    "無限直播間/寫作系統.md",
-    "無限直播間/03-章節/01-夜班便利店/001-规则的第一夜.md",
-    "_提示詞工坊/邏輯修復.md",
-    "_提示詞工坊/章節重寫.md",
-    "_提示詞工坊/爽點加強.md",
     "_提示詞工坊",
-    "無限直播間/04-狀態追蹤/規則連續性.md",
-    "無限直播間/04-狀態追蹤/系統狀態.md",
-    "無限直播間/04-狀態追蹤/場景機制.md",
     "_腳本/validate_chapter_logic.py",
-    "_系統/status_taxonomy.md",
     "_系統",
     "_腳本/rebuild_database.py",
-    "無限直播間/02-大綱/卷/02-記憶放映廳.md",
-    "無限直播間/02-大綱/卷/01-夜班便利店_卷總結.md",
-    "無限直播間/05-AI上下文/下一章指令.md",
-    "無限直播間/03-章節/01-夜班便利店/008-结算.md",
-    "_腳本/start_volume.py",
-    "_腳本/close_volume.py",
-    "無限直播間/05-AI上下文",
-    "_腳本/小說設定.py",
-    "無限直播間/03-章節/01-夜班便利店"
+    "_腳本/start_volume.py"
   ]
 }
