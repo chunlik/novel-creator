@@ -13,15 +13,44 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "無限直播間/00-AI導航.md",
+                "file": "無限直播間/風格規則.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "00-AI導航"
+              "title": "風格規則"
+            }
+          },
+          {
+            "id": "b98bbbcfa9f6281a",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "無限直播間/禁止事項.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "禁止事項"
+            }
+          },
+          {
+            "id": "55a967bef4462cf4",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "無限直播間/寫作系統.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "寫作系統"
             }
           }
-        ]
+        ],
+        "currentTab": 2
       }
     ],
     "direction": "vertical"
@@ -94,7 +123,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "無限直播間/00-AI導航.md",
+                "file": "無限直播間/寫作系統.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -104,7 +133,7 @@
                 "unlinkedCollapsed": true
               },
               "icon": "links-coming-in",
-              "title": "Backlinks for 00-AI導航"
+              "title": "Backlinks for 寫作系統"
             }
           },
           {
@@ -113,12 +142,12 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "無限直播間/00-AI導航.md",
+                "file": "無限直播間/寫作系統.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               },
               "icon": "links-going-out",
-              "title": "Outgoing links from 00-AI導航"
+              "title": "Outgoing links from 寫作系統"
             }
           },
           {
@@ -156,13 +185,13 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "無限直播間/00-AI導航.md",
+                "file": "無限直播間/寫作系統.md",
                 "followCursor": false,
                 "showSearch": false,
                 "searchQuery": ""
               },
               "icon": "lucide-list",
-              "title": "Outline of 00-AI導航"
+              "title": "Outline of 寫作系統"
             }
           }
         ]
@@ -183,13 +212,17 @@
       "bases:Create new base": false
     }
   },
-  "active": "ee68a28d8ed0fe52",
+  "active": "55a967bef4462cf4",
   "lastOpenFiles": [
+    "無限直播間/禁止事項.md",
+    "無限直播間/風格規則.md",
+    "無限直播間/05-AI上下文/下一章指令.md",
+    "無限直播間/05-AI上下文/當前寫作包.md",
     "無限直播間/03-章節/01-夜班便利店/001-规则的第一夜.md",
+    "無限直播間/00-AI導航.md",
     "無限直播間/06-審校/矛盾檢測.md",
     "無限直播間/06-審校",
     "無限直播間/03-章節/01-夜班便利店/001-規則的第一夜.md",
-    "無限直播間/00-AI導航.md",
     "無限直播間/00-小說首頁.md",
     "無限直播間/06-知識庫/story_quality_rubric.md",
     "_共用範本/章節範本.md",
@@ -206,13 +239,9 @@
     "無限直播間/02-大綱/卷/卷2-記憶放映廳/05-卷啟動包.md",
     "無限直播間/02-大綱/卷/卷2-記憶放映廳",
     "無限直播間/05-AI上下文/風格規則.md",
-    "無限直播間/禁止事項.md",
-    "無限直播間/風格規則.md",
     "_共用範本/prompt-模板/邏輯修復.md",
     "_共用範本/prompt-模板/章節重寫.md",
     "_共用範本/prompt-模板/章節生成.md",
-    "_共用範本/prompt-模板/爽點加強.md",
-    "_共用範本/prompt-模板/伏筆回收.md",
     "_共用範本/prompt-模板",
     "無限直播間/08-靈感碎片/事件",
     "無限直播間/08-靈感碎片/靈感",
