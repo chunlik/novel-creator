@@ -101,58 +101,9 @@ def get_scene_mechanics(vault: Path, novel: str) -> str:
     return read_state_doc(vault, novel, "場景機制.md", "（尚無場景機制）")
 
 
-def get_story_quality_rubric(vault: Path) -> str:
-    return read_system_doc(vault, "story_quality_rubric.md", "（尚無小說品質規準）")
-
-
-def get_foreshadowing_table(vault: Path, novel: str) -> str:
-    path = vault / novel / "04-狀態追蹤" / "伏筆管理.md"
-    body = read_body(path)
-    if not body:
-        foreshadow_dir = vault / novel / "04-狀態追蹤"
-        lines = []
-        if foreshadow_dir.exists():
-            for f in sorted(foreshadow_dir.iterdir()):
-                if f.suffix == ".md":
-                    fm = read_frontmatter(f)
-                    if fm.get("type") == "foreshadowing" and fm.get("status") == "active":
-                        title = fm.get("title", f.stem)
-                        imp = fm.get("importance", "?")
-                        target = fm.get("target_chapter", "?")
-                        lines.append(f"- [{imp}] {title} (預計回收: 第{target}章)")
-        return "\n".join(lines) if lines else "（無活躍伏筆）"
-    return body
-
-
-def get_recent_chapters(vault: Path, novel: str, chapter: int, count: int = 3) -> str:
-    paths = get_chapter_paths(vault, novel)
-    relevant = [p for p in paths if _chapter_number(p) < chapter]
-    relevant = relevant[-count:]
-    parts = []
-    for p in relevant:
-        num = _chapter_number(p)
-        body = read_body(p)
-        summary = body[:1000] if len(body) > 1000 else body
-        parts.append(f"=== 第{num}章 ===\n{summary}")
-    return "\n\n".join(parts) if parts else "（無前章）"
-
-
-def _chapter_number(path: Path) -> int:
-    m = re.search(r"(\d+)", path.stem)
-    return int(m.group(1)) if m else 0
-
-
-def get_arc_info(vault: Path, novel: str, volume: int = None) -> str:
-    if volume is None:
-        return ""
-    arcs_dir = vault / novel / "02-大綱"
-    if not arcs_dir.exists():
-        return ""
-    vol_prefix = f"{volume:02d}"
-    for f in sorted(arcs_dir.iterdir()):
-        if f.suffix == ".md" and f.stem.startswith(vol_prefix):
-            return read_body(f)
-    return ""
+def get_story_quality_rubric(vault: Path, novel: str) -> str:
+    path = vault / novel / "06-知識庫" / "story_quality_rubric.md"
+    return read_body(path) or "（尚無小說品質規準）"
 
 
 def get_story_bible(vault: Path, novel: str) -> str:
@@ -161,33 +112,33 @@ def get_story_bible(vault: Path, novel: str) -> str:
 
 
 def get_tension_curve(vault: Path, novel: str, chapter: int) -> str:
-    path = vault / novel / "02-大綱" / "張力曲線.md"
-    body = read_body(path)
-    if not body:
-        return ""
-    lines = body.split("\n")
-    for line in lines:
-        if line.startswith(f"| {chapter} |"):
-            return line.strip()
+    import glob
+    vol_dirs = sorted(Path(vault / novel / "02-大綱" / "卷").iterdir())
+    for vd in reversed(vol_dirs):
+        tc = vd / "04-張力曲線.md"
+        if tc.exists():
+            return read_body(tc) or ""
     return ""
 
 
-def vector_search(vault: Path, novel: str, query: str, k: int = 5) -> str:
-    import subprocess
-    script = vault / "_腳本" / "vector_search.py"
-    if not script.exists():
-        return ""
-    try:
-        result = subprocess.run(
-            ["python", str(script), "--novel", novel, "--query", query, "--k", str(k)],
-            capture_output=True, text=True, timeout=30
-        )
-        return result.stdout.strip()
-    except Exception:
-        return ""
+def get_recent_chapters(vault: Path, novel: str, chapter: int, n: int = 3) -> str:
+    paths = get_chapter_paths(vault, novel)
+    recent = [p for p in paths if extract_chapter_no(p) and extract_chapter_no(p) < chapter][-n:]
+    lines = []
+    for p in recent:
+        fm = read_frontmatter(p)
+        no = fm.get("chapter_no", p.stem)
+        title = fm.get("title", p.stem)
+        lines.append(f"- 第{no}章 {title}")
+    return "\n".join(lines) if lines else "（無前章）"
 
 
-def build_context(vault: Path, novel: str, chapter: int, vector_query: str = None) -> str:
+def extract_chapter_no(path: Path) -> int | None:
+    fm = read_frontmatter(path)
+    return fm.get("chapter_no")
+
+
+def build_context(vault: Path, novel: str, chapter: int, vector_query: str | None = None) -> str:
     parts = []
 
     parts.append("=== 全局摘要 ===")
@@ -211,11 +162,8 @@ def build_context(vault: Path, novel: str, chapter: int, vector_query: str = Non
     parts.append("\n=== 場景機制 ===")
     parts.append(get_scene_mechanics(vault, novel))
 
-    parts.append("\n=== 伏筆管理 ===")
-    parts.append(get_foreshadowing_table(vault, novel))
-
-    parts.append("\n=== 小說品質規準 ===")
-    parts.append(get_story_quality_rubric(vault))
+    parts.append("\n=== 品質規準 ===")
+    parts.append(get_story_quality_rubric(vault, novel))
 
     parts.append("\n=== 故事聖經 ===")
     bible = get_story_bible(vault, novel)
@@ -230,8 +178,15 @@ def build_context(vault: Path, novel: str, chapter: int, vector_query: str = Non
 
     if vector_query:
         parts.append("\n=== 語義檢索結果 ===")
-        vs = vector_search(vault, novel, vector_query)
-        parts.append(vs if vs else "（無結果）")
+        import subprocess
+        import sys
+        result = subprocess.run(
+            [sys.executable, str(Path(__file__).parent / "vector_search.py"),
+             "--novel", novel, "--query", vector_query, "--k", "5"],
+            capture_output=True, text=True, cwd=Path(__file__).parent
+        )
+        vs = result.stdout.strip() or "（無結果）"
+        parts.append(vs)
 
     return "\n".join(parts)
 
