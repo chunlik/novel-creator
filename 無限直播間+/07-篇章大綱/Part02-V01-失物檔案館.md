@@ -1,11 +1,11 @@
 ---
 type: 卷
-status: 部分定案
+status: 已定案
 level: Level-C
 tags:
   - 卷
   - 副本
-  - 部分定案
+  - 已定案
   - Level-C
 part: Part02
 volume: V01
@@ -25,7 +25,7 @@ updated: 2026-05-31
 
 ## 文件狀態
 
-【部分定案】
+【已定案】
 
 本文是 Part02 下的第一卷。每一卷是一個副本，因此本卷對應副本為 [[失物檔案館]]。
 
