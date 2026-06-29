@@ -8,7 +8,7 @@
       "searchable": 1,
       "quickSearch": 1,
       "filterable": 1,
-      "ext": "https://raw.githubusercontent.com/chunlik/novel-creator/refs/heads/main/jstv/js/fdzys.js"
+      "ext": "https://raw.githubusercontent.com/chunlik/novel-creator/main/jstv/js/fdzys.js"
     }
   ]
 }
