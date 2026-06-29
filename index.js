@@ -1,33 +1,21 @@
-// CatPawOpen / JSTV demo source.
-// Demo-only content: public sample videos, no third-party site scraping.
-
-const appConfig = {
+var appConfig = {
   ver: 1,
-  title: "JSTV學習源",
+  title: "JSTV Demo",
   tabs: [
     {
-      name: "示範影片",
+      name: "Demo",
       ext: { type: "demo" },
     },
   ],
 };
 
-const videos = [
+var videos = [
   {
     id: "bbb",
     name: "Big Buck Bunny",
-    cover: "https://peach.blender.org/wp-content/uploads/title_anouncement.jpg",
-    remark: "示範影片",
-    content: "Blender Foundation 公開示範影片，用來測試 JSTV 列表、詳情與播放流程。",
+    cover: "",
+    remark: "Demo",
     url: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
-  },
-  {
-    id: "sintel",
-    name: "Sintel",
-    cover: "https://durian.blender.org/wp-content/uploads/2010/05/sintel_poster.jpg",
-    remark: "示範影片",
-    content: "Blender Foundation 公開示範影片，用來測試搜尋與播放流程。",
-    url: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4",
   },
 ];
 
@@ -58,7 +46,10 @@ function toCard(item) {
 }
 
 function findVideo(id) {
-  return videos.find((item) => item.id === id);
+  for (var i = 0; i < videos.length; i++) {
+    if (videos[i].id === id) return videos[i];
+  }
+  return null;
 }
 
 async function getConfig() {
@@ -66,24 +57,20 @@ async function getConfig() {
 }
 
 async function getCards(ext) {
-  fromArgs(ext);
-  return toJson({
-    list: videos.map(toCard),
-  });
+  return toJson({ list: videos.map(toCard) });
 }
 
 async function getTracks(ext) {
-  const args = fromArgs(ext);
-  const item = findVideo(args.id);
+  var args = fromArgs(ext);
+  var item = findVideo(args.id);
   if (!item) return toJson({ list: [] });
-
   return toJson({
     list: [
       {
-        title: "示範線路",
+        title: "Demo",
         tracks: [
           {
-            name: "播放",
+            name: "Play",
             pan: "",
             ext: { url: item.url },
           },
@@ -94,33 +81,31 @@ async function getTracks(ext) {
 }
 
 async function getPlayinfo(ext) {
-  const args = fromArgs(ext);
-  const url = args.url || "";
-
+  var args = fromArgs(ext);
   return toJson({
-    urls: url ? [url] : [],
-    headers: url
-      ? [
-          {
-            "User-Agent":
-              "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
-          },
-        ]
-      : [],
+    urls: args.url ? [args.url] : [],
+    headers: args.url ? [{ "User-Agent": "Mozilla/5.0" }] : [],
   });
 }
 
 async function search(ext) {
-  const args = fromArgs(ext);
-  const text = String(args.text || "").toLowerCase();
-  const list = videos.filter((item) => {
-    return (
-      item.name.toLowerCase().includes(text) ||
-      item.content.toLowerCase().includes(text)
-    );
+  var args = fromArgs(ext);
+  var text = String(args.text || "").toLowerCase();
+  var list = videos.filter(function (item) {
+    return item.name.toLowerCase().indexOf(text) >= 0;
   });
+  return toJson({ list: list.map(toCard) });
+}
 
-  return toJson({
-    list: list.map(toCard),
-  });
+var api = {
+  getConfig: getConfig,
+  getCards: getCards,
+  getTracks: getTracks,
+  getPlayinfo: getPlayinfo,
+  search: search,
+};
+
+if (typeof module !== "undefined") {
+  module.exports = api;
+  module.exports.default = api;
 }
