@@ -1,78 +1,71 @@
-var appConfig = {
+const appConfig = {
   ver: 1,
   title: "JSTV Demo",
+  site: "https://commondatastorage.googleapis.com",
   tabs: [
     {
       name: "Demo",
-      ext: { type: "demo" },
+      ext: {
+        id: 1,
+      },
     },
   ],
 };
 
-var videos = [
+const videos = [
   {
     id: "bbb",
     name: "Big Buck Bunny",
-    cover: "",
-    remark: "Demo",
+    cover: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/images/BigBuckBunny.jpg",
+    remarks: "Demo",
     url: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+  },
+  {
+    id: "sintel",
+    name: "Sintel",
+    cover: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/images/Sintel.jpg",
+    remarks: "Demo",
+    url: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4",
   },
 ];
 
-function toJson(value) {
-  if (typeof jsonify === "function") return jsonify(value);
-  return JSON.stringify(value);
-}
-
-function fromArgs(value) {
-  if (typeof argsify === "function") return argsify(value);
-  if (!value) return {};
-  if (typeof value === "object") return value;
-  try {
-    return JSON.parse(value);
-  } catch (e) {
-    return {};
-  }
-}
-
-function toCard(item) {
-  return {
-    vod_id: item.id,
-    vod_name: item.name,
-    vod_pic: item.cover,
-    vod_remarks: item.remark,
-    ext: { id: item.id },
-  };
-}
-
-function findVideo(id) {
-  for (var i = 0; i < videos.length; i++) {
-    if (videos[i].id === id) return videos[i];
-  }
-  return null;
-}
-
 async function getConfig() {
-  return toJson(appConfig);
+  return jsonify(appConfig);
 }
 
 async function getCards(ext) {
-  return toJson({ list: videos.map(toCard) });
+  ext = argsify(ext);
+  const cards = videos.map((item) => {
+    return {
+      vod_id: item.id,
+      vod_name: item.name,
+      vod_pic: item.cover,
+      vod_remarks: item.remarks,
+      ext: {
+        url: item.url,
+      },
+    };
+  });
+
+  return jsonify({
+    list: cards,
+  });
 }
 
 async function getTracks(ext) {
-  var args = fromArgs(ext);
-  var item = findVideo(args.id);
-  if (!item) return toJson({ list: [] });
-  return toJson({
+  ext = argsify(ext);
+
+  return jsonify({
     list: [
       {
-        title: "Demo",
+        title: "Default",
         tracks: [
           {
             name: "Play",
             pan: "",
-            ext: { url: item.url },
+            ext: {
+              url: ext.url,
+            },
           },
         ],
       },
@@ -81,31 +74,37 @@ async function getTracks(ext) {
 }
 
 async function getPlayinfo(ext) {
-  var args = fromArgs(ext);
-  return toJson({
-    urls: args.url ? [args.url] : [],
-    headers: args.url ? [{ "User-Agent": "Mozilla/5.0" }] : [],
+  ext = argsify(ext);
+
+  return jsonify({
+    urls: [ext.url],
+    headers: [
+      {
+        "User-Agent":
+          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+      },
+    ],
   });
 }
 
 async function search(ext) {
-  var args = fromArgs(ext);
-  var text = String(args.text || "").toLowerCase();
-  var list = videos.filter(function (item) {
-    return item.name.toLowerCase().indexOf(text) >= 0;
+  ext = argsify(ext);
+  const text = String(ext.text || "").toLowerCase();
+  const cards = videos
+    .filter((item) => item.name.toLowerCase().includes(text))
+    .map((item) => {
+      return {
+        vod_id: item.id,
+        vod_name: item.name,
+        vod_pic: item.cover,
+        vod_remarks: item.remarks,
+        ext: {
+          url: item.url,
+        },
+      };
+    });
+
+  return jsonify({
+    list: cards,
   });
-  return toJson({ list: list.map(toCard) });
-}
-
-var api = {
-  getConfig: getConfig,
-  getCards: getCards,
-  getTracks: getTracks,
-  getPlayinfo: getPlayinfo,
-  search: search,
-};
-
-if (typeof module !== "undefined") {
-  module.exports = api;
-  module.exports.default = api;
 }
